@@ -1,0 +1,213 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:component-scan base-package="com.springapp.mvc"/>
+
+    <util:properties id="emailSettings">
+        <prop key="mail.smtp.auth">true</prop>
+        <prop key="mail.smtp.starttls.enable">true</prop>
+        <prop key="mail.smtp.host">smtp.gmail.com</prop>
+        <prop key="mail.smtp.port">587</prop>
+    </util:properties>
+    <mvc:annotation-driven />
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+                destroy-method="close">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+        <property name="url"
+                        value="jdbc:mariadb://localhost:3307/db_examsignal" />
+        <!--<property name="url"
+                  value="jdbc:mariadb://localhost:3306/db_examsignal" />-->
+        <property name="username" value="root" />
+        <property name="password" value="test123" />
+        <!--<property name="password" value="examsignal" />-->
+    </bean>
+
+    <!--<bean id="sessionFactory"
+                class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mappingResources">
+            <list>
+                <value>orm/model/AuthAccess.hbm.xml</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.show_sql">false</prop>
+            </props>
+        </property>
+    </bean>-->
+    <bean id="defaultAuthenticationService" class="com.springapp.service.DefaultAuthenticationService">
+        <property name="authenticationDao" ref="defaultAuthenticationDao"/>
+        <property name="passwordEncryptionService" ref="passwordMatcherService" />
+        <property name="higherEducationDao" ref="higherEducationDao"/>
+        <property name="testimonialDao" ref="testimonialDao"/>
+        <property name="courseDao" ref="courseDao"/>
+        <property name="facebookAccessDao" ref="facebookAccessDao"/>
+        <property name="resetCodeDao" ref="resetCodeDao"/>
+    </bean>
+    <bean id = "defaultAuthenticationDao" class="com.springapp.repository.AuthAccessDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "courseDao" class="com.springapp.repository.CourseDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "examDao" class="com.springapp.repository.ExamDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "questionDao" class="com.springapp.repository.QuestionDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "subjectDao" class="com.springapp.repository.SubjectDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="subjectNameDao" class="com.springapp.repository.SubjectNameDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "userProfileDao" class="com.springapp.repository.UserProfileDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "adminProfileDao" class="com.springapp.repository.AdminProfileDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id = "higherEducationDao" class="com.springapp.repository.HigherEducationDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="subscriptionDetailDao" class="com.springapp.repository.SubscriptionDetailDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="testimonialDao" class="com.springapp.repository.TestimonialDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="resetCodeDao" class="com.springapp.repository.ResetCodeDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id ="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <bean id="preferredCourseDao" class="com.springapp.repository.PreferredCourseDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="pointsDao" class="com.springapp.repository.PointsDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="facebookAccessDao" class="com.springapp.repository.FacebookAccessDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="userExamDao" class="com.springapp.repository.UserExamDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="offerDao" class="com.springapp.repository.OfferDaoImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id ="passwordMatcherService" class="com.springapp.service.PasswordEncryptionService" />
+    <bean id ="loginFormToAuthenticationRequest" class="com.springapp.adaptor.LoginFormToAuthenticationRequest"/>
+    <bean id="registerFormToRegistrationRequest" class="com.springapp.adaptor.RegisterFormToRegistrationRequest"/>
+    <bean class="com.springapp.service.RegistrationService">
+        <property name="authAccessDaoImpl" ref="defaultAuthenticationDao"/>
+        <property name="userProfileDaoImpl" ref="userProfileDao" />
+        <property name="passwordEncryptionService" ref="passwordMatcherService"/>
+        <property name="uniqueUserIdGeneratorService" ref="uniqueUserIdGeneratorService"/>
+        <property name="pointsDao" ref="pointsDao"/>
+        <property name="facebookAccessDao" ref="facebookAccessDao"/>
+    </bean>
+    <bean id ="uniqueUserIdGeneratorService" class="com.springapp.service.UniqueUserIdGeneratorService"/>
+    <bean id="loginHelper" class="com.springapp.service.LoginHelper">
+        <property name="userProfileDao" ref="userProfileDao"/>
+        <property name="adminProfileDao" ref="adminProfileDao"/>
+    </bean>
+    <bean id="adminService" class="com.springapp.service.AdminService">
+        <property name="courseDao" ref="courseDao"/>
+        <property name="subjectDao" ref="subjectDao"/>
+        <property name="subjectNameDao" ref="subjectNameDao"/>
+        <property name="examDao" ref="examDao"/>
+        <property name="questionDao" ref="questionDao"/>
+        <property name="subscriptionDetailDao" ref="subscriptionDetailDao"/>
+        <property name="preferredCourseDao" ref="preferredCourseDao"/>
+    </bean>
+    <bean id="emailingService" class="com.springapp.service.EmailingService">
+        <property name="emailProperties" ref="emailSettings"/>
+    </bean>
+    <bean id="referralEmailingService" class="com.springapp.service.ReferralEmailingService">
+        <property name="emailingService" ref="emailingService"/>
+        <property name="twoWayEncryptionService" ref="twoWayEncryptionService"/>
+    </bean>
+    <bean id="twoWayEncryptionService" class="com.springapp.service.TwoWayEncryptionService"/>
+
+    <bean id="userService" class="com.springapp.service.UserService">
+        <property name="userProfileDao" ref="userProfileDao"/>
+        <property name="adminProfileDao" ref="adminProfileDao"/>
+        <property name="subscriptionDetailDao" ref="subscriptionDetailDao"/>
+        <property name="courseDao" ref="courseDao"/>
+        <property name="preferredCourseDao" ref="preferredCourseDao"/>
+        <property name="examDao" ref="examDao"/>
+        <property name="subjectDao" ref="subjectDao"/>
+        <property name="questionDao" ref="questionDao"/>
+        <property name="userExamDao" ref="userExamDao"/>
+        <property name="pointsDao" ref="pointsDao"/>
+        <property name="offerDao" ref="offerDao"/>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10000000" /> <!-- ~10 MB -->
+    </bean>
+    <bean class="com.springapp.mvc.model.UserPhotoPath" id="userPhotoPath">
+        <property name="path" value="D:/temp/user-images"/>
+        <!--<property name="path" value="/home/application/user-images"/>-->
+    </bean>
+
+    <bean class="com.springapp.mvc.model.UserPhotoPath" id="fbShareTemplatePhotoPath">
+        <property name="path" value="F:\projects\examsignalspring\src\main\webapp\resources\assets\images"/>
+        <!--<property name="path" value="/opt/apache/webapps/examsignal/resources/assets/images"/>-->
+    </bean>
+
+    <bean class="com.springapp.mvc.model.UserPhotoPath" id="fbShareResultPhotoPath">
+        <property name="path" value="F:\projects\examsignalspring\src\main\webapp\resources\result"/>
+        <!--<property name="path" value="/opt/apache/webapps/examsignal/resources/result"/>-->
+    </bean>
+
+    <mvc:resources mapping="/resources/**" location="/resources/assets/"
+                   cache-period="31556926"/>
+    <mvc:resources mapping="/fbshareresult/**" location="/resources/result/"
+                   cache-period="0"/>
+    <mvc:resources mapping="/testimonial/**" location="file:/D:/temp/testimonial/"/>
+     <!--<mvc:resources mapping="/testimonial/**" location="file:/home/application/testimonials/" />-->
+
+    <mvc:resources mapping="/user-images/**" location="file:/D:/temp/user-images/"/>
+    <!--<mvc:resources mapping="/user-images/**" location="file:/home/application/user-images/" />-->
+
+    <mvc:annotation-driven >
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="jacksonObjectMapper" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="jaxbAnnotationInspector" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector" />
+
+    <bean id="jacksonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="annotationIntrospector" ref="jaxbAnnotationInspector" />
+    </bean>
+
+</beans>
